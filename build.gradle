@@ -20,6 +20,9 @@ dependencies {
 	implementation 'mysql:mysql-connector-java'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.0.RC1'
+	implementation 'org.mapstruct:mapstruct:1.5.0.RC1'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
