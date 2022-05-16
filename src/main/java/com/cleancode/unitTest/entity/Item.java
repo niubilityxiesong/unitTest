@@ -31,4 +31,5 @@ public class Item {
     private BigDecimal unitPrice;
     private Double discount;
     private LocalDateTime expiredTime;
+    private String labels;
 }

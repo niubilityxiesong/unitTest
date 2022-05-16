@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,4 +22,5 @@ public class ItemDto {
     private BigDecimal unitPrice;
     private Double discount;
     private LocalDateTime expiredTime;
+    private List<ItemLabel> labels;
 }
