@@ -5,8 +5,8 @@ public enum ItemLabel {
 
     public static ItemLabel fromString(String stringLabel) {
         try {
-            return ItemLabel.valueOf(stringLabel);
-        } catch (NullPointerException e) {
+            return ItemLabel.valueOf(stringLabel.toUpperCase());
+        } catch (IllegalArgumentException e) {
             return ItemLabel.UNKNOWN;
         }
     }

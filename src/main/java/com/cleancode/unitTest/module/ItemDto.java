@@ -23,4 +23,5 @@ public class ItemDto {
     private Double discount;
     private LocalDateTime expiredTime;
     private List<ItemLabel> labels;
+    private String userId;
 }

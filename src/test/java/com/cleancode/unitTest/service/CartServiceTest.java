@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.when;
@@ -24,10 +25,11 @@ public class CartServiceTest {
     private CartService cartService;
 
     @Test
-    void should_return_itemDto_list_when_repository_have_items() {
-        when(itemRepository.findAll()).thenReturn(Collections.singletonList(Item.builder().build()));
+    void should_return_1_itemDto_when_user_have_items_in_cart() {
+        Integer customerId = 1;
+        when(itemRepository.findByUserId(customerId)).thenReturn(Optional.of(Collections.singletonList(Item.builder().build())));
 
-        final List<ItemDto> items = cartService.getItems();
+        final List<ItemDto> items = cartService.getUserItems(customerId);
 
         assertThat(items.size()).isEqualTo(1);
     }
