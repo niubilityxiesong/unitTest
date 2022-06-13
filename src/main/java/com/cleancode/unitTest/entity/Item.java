@@ -26,7 +26,7 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private String describe;
+    private String context;
     private String imageUrl;
     private BigDecimal unitPrice;
     private Double discount;

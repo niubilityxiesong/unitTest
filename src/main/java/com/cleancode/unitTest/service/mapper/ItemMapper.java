@@ -34,5 +34,8 @@ public abstract class ItemMapper {
     }
 
     @Mapping(target = "labels", ignore = true)
-    public abstract ItemDto toDto(Item item);
+    public abstract ItemDto itemToDto(Item item);
+
+    @Mapping(target = "labels", ignore = true)
+    public abstract Item dtoToItem(ItemDto itemDto);
 }

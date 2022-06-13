@@ -1,6 +1,7 @@
 package com.cleancode.unitTest.service;
 
 import com.cleancode.unitTest.entity.Item;
+import com.cleancode.unitTest.exception.ItemNotValidException;
 import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,11 +20,21 @@ import static com.cleancode.unitTest.service.mapper.ItemMapper.ITEM_MAPPER;
 public class CartService {
     private final ItemRepository itemRepository;
 
+    public void setItem(Integer userId, ItemDto itemDto) {
+        if (Objects.nonNull(itemDto.getUserId())) {
+            throw new ItemNotValidException();
+        }
+
+        itemDto.setUserId(userId);
+        final Item item = ITEM_MAPPER.dtoToItem(itemDto);
+        itemRepository.save(item);
+    }
+
     public List<ItemDto> getUserItems(Integer customerId) {
         Optional<List<Item>> itemsOptional = itemRepository.findByUserId(customerId);
         if (itemsOptional.isPresent()) {
             List<Item> items = itemsOptional.get();
-            return items.stream().map(ITEM_MAPPER::toDto).collect(Collectors.toList());
+            return items.stream().map(ITEM_MAPPER::itemToDto).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
