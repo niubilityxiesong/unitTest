@@ -6,6 +6,7 @@ import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,5 +38,22 @@ public class CartService {
             return items.stream().map(ITEM_MAPPER::itemToDto).collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+    @Transactional
+    public void grantItem(Integer userId, ItemDto itemDto) {
+        if (Objects.isNull(itemDto.getUserId())) {
+            throw new ItemNotValidException();
+        }
+
+        if (userId.equals(itemDto.getUserId())) {
+            throw new ItemNotValidException();
+        }
+
+        final Item item1 = ITEM_MAPPER.dtoToItem(itemDto);
+        itemRepository.save(item1);
+        itemDto.setUserId(userId);
+        final Item item2 = ITEM_MAPPER.dtoToItem(itemDto);
+        itemRepository.save(item2);
     }
 }

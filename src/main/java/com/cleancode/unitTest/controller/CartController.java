@@ -36,4 +36,11 @@ public class CartController {
         cartService.setItem(userId, itemDto);
         return ResponseEntity.created(URI.create("/cart/" + userId.toString() + "/item")).build();
     }
+
+    @PostMapping("/gift/{userId}/item")
+    public ResponseEntity<String> grantItem(@PathVariable Integer userId, @RequestBody ItemDto itemDto) {
+        customerService.isValidUser(userId);
+        cartService.grantItem(userId, itemDto);
+        return ResponseEntity.created(URI.create("/cart/gift/" + userId.toString() + "/item")).build();
+    }
 }
