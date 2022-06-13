@@ -33,6 +33,22 @@ public abstract class ItemMapper {
         itemDto.labels(itemLabels);
     }
 
+    @BeforeMapping
+    protected void enrichItemLabels(ItemDto itemDto, @MappingTarget Item.ItemBuilder item) {
+        final List<ItemLabel> labels = itemDto.getLabels();
+        if (labels.isEmpty()) {
+            return;
+        }
+
+        StringBuilder itemLabels = new StringBuilder();
+        for (ItemLabel label : labels) {
+            itemLabels.append(label);
+            itemLabels.append(",");
+        }
+        itemLabels.deleteCharAt(itemLabels.lastIndexOf(","));
+        item.labels(itemLabels.toString());
+    }
+
     @Mapping(target = "labels", ignore = true)
     public abstract ItemDto itemToDto(Item item);
 
