@@ -1,8 +1,10 @@
 package com.cleancode.unitTest.service;
 
+import com.cleancode.unitTest.entity.Customer;
 import com.cleancode.unitTest.entity.Item;
 import com.cleancode.unitTest.exception.ItemNotValidException;
 import com.cleancode.unitTest.module.ItemDto;
+import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,5 +57,9 @@ public class CartService {
         itemDto.setUserId(userId);
         final Item item2 = ITEM_MAPPER.dtoToItem(itemDto);
         itemRepository.save(item2);
+    }
+
+    public ItemTotalPriceDto getTotalPrice(Customer customer) {
+        return null;
     }
 }

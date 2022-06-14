@@ -30,4 +30,12 @@ public class CustomerService {
             throw new CustomerDoNotExistException();
         }
     }
+
+    public Customer getCustomer(Integer userId) {
+        Optional<Customer> customerOptional = customerRepository.findById(userId);
+        if (customerOptional.isEmpty()) {
+            throw new CustomerDoNotExistException();
+        }
+        return customerOptional.get();
+    }
 }

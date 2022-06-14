@@ -1,6 +1,8 @@
 package com.cleancode.unitTest.controller;
 
+import com.cleancode.unitTest.entity.Customer;
 import com.cleancode.unitTest.module.ItemDto;
+import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.service.CartService;
 import com.cleancode.unitTest.service.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +44,11 @@ public class CartController {
         customerService.isValidUser(userId);
         cartService.grantItem(userId, itemDto);
         return ResponseEntity.created(URI.create("/cart/gift/" + userId.toString() + "/item")).build();
+    }
+
+    @GetMapping("/{userId}/calculate-total-price")
+    public ItemTotalPriceDto calculateTotalPrice(@PathVariable Integer userId) {
+        final Customer customer = customerService.getCustomer(userId);
+        return cartService.getTotalPrice(customer);
     }
 }
