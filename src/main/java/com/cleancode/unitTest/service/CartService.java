@@ -45,16 +45,15 @@ public class CartService {
         return Collections.emptyList();
     }
 
-    @Transactional
     public void grantItem(Integer userId, ItemDto itemDto) {
-        if (Objects.isNull(itemDto.getUserId())) {
+        if (Objects.isNull(itemDto.getUserId()) || userId.equals(itemDto.getUserId())) {
             throw new ItemNotValidException();
         }
+        saveItemToUsers(userId, itemDto);
+    }
 
-        if (userId.equals(itemDto.getUserId())) {
-            throw new ItemNotValidException();
-        }
-
+    @Transactional
+    private void saveItemToUsers(Integer userId, ItemDto itemDto) {
         final Item userItem = ITEM_MAPPER.dtoToItem(itemDto);
         itemRepository.save(userItem);
         itemDto.setUserId(userId);

@@ -36,7 +36,7 @@ public abstract class ItemMapper {
     @BeforeMapping
     protected void enrichItemLabels(ItemDto itemDto, @MappingTarget Item.ItemBuilder item) {
         final List<ItemLabel> labels = itemDto.getLabels();
-        if (labels.isEmpty()) {
+        if (labels == null || labels.isEmpty()) {
             return;
         }
 
