@@ -4,6 +4,7 @@ import com.cleancode.unitTest.entity.Item;
 import com.cleancode.unitTest.exception.ItemNotValidException;
 import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.repository.ItemRepository;
+import com.cleancode.unitTest.service.mapper.ItemMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +27,9 @@ import static org.mockito.Mockito.when;
 public class CartServiceTest {
     @Mock
     private ItemRepository itemRepository;
+
+    @Mock
+    private ItemMapper itemMapper;
 
     @InjectMocks
     private CartService cartService;
@@ -80,6 +84,18 @@ public class CartServiceTest {
         cartService.setItem(1, itemDto);
 
         verify((itemRepository), times(1)).save(any(Item.class));
+    }
+
+    @Test
+    void should_save_item_with_id_1_when_input_user_id_is_1() {
+        ItemDto itemDto = ItemDto.builder().build();
+        Item expected = Item.builder().build();
+        when(itemMapper.dtoToItem(itemDto)).thenReturn(expected);
+
+        cartService.setItem(1, itemDto);
+
+        verify((itemRepository), times(1)).save(expected);
+        assertThat(expected.getUserId()).isEqualTo(1);
     }
 
     @Test

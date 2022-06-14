@@ -6,6 +6,7 @@ import com.cleancode.unitTest.exception.ItemNotValidException;
 import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.repository.ItemRepository;
+import com.cleancode.unitTest.service.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,22 +18,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.cleancode.unitTest.service.mapper.ItemMapper.ITEM_MAPPER;
-
 @Service
 @RequiredArgsConstructor
 public class CartService {
     private static final String VIP_DISCOUNT_LIMIT = "100";
     private static final String VIP_DISCOUNT = "10";
+
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
     public void setItem(Integer userId, ItemDto itemDto) {
         if (Objects.nonNull(itemDto.getUserId())) {
             throw new ItemNotValidException();
         }
 
-        itemDto.setUserId(userId);
-        final Item item = ITEM_MAPPER.dtoToItem(itemDto);
+        final Item item = itemMapper.dtoToItem(itemDto);
+        item.setUserId(userId);
         itemRepository.save(item);
     }
 
@@ -40,7 +41,7 @@ public class CartService {
         Optional<List<Item>> itemsOptional = itemRepository.findByUserId(customerId);
         if (itemsOptional.isPresent()) {
             List<Item> items = itemsOptional.get();
-            return items.stream().map(ITEM_MAPPER::itemToDto).collect(Collectors.toList());
+            return items.stream().map(itemMapper::itemToDto).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
@@ -54,10 +55,10 @@ public class CartService {
 
     @Transactional
     private void saveItemToUsers(Integer userId, ItemDto itemDto) {
-        final Item userItem = ITEM_MAPPER.dtoToItem(itemDto);
+        final Item userItem = itemMapper.dtoToItem(itemDto);
         itemRepository.save(userItem);
         itemDto.setUserId(userId);
-        final Item anotherUserItem = ITEM_MAPPER.dtoToItem(itemDto);
+        final Item anotherUserItem = itemMapper.dtoToItem(itemDto);
         itemRepository.save(anotherUserItem);
     }
 
@@ -96,14 +97,14 @@ public class CartService {
             itemTotalPriceDto.setOriginalPrice(
                     itemTotalPriceDto.getOriginalPrice().add(item.getUnitPrice())
             );
-            itemTotalPriceDto.setDiscountPrice(
-                    itemTotalPriceDto.getDiscountPrice().add(
+            itemTotalPriceDto.setTotalPrice(
+                    itemTotalPriceDto.getTotalPrice().add(
                             item.getUnitPrice().multiply(decimalDiscount)
                     )
             );
         });
-        itemTotalPriceDto.setTotalPrice(
-                itemTotalPriceDto.getOriginalPrice().subtract(itemTotalPriceDto.getDiscountPrice())
+        itemTotalPriceDto.setDiscountPrice(
+                itemTotalPriceDto.getOriginalPrice().subtract(itemTotalPriceDto.getTotalPrice())
         );
         return itemTotalPriceDto;
     }

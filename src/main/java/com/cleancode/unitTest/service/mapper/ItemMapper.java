@@ -13,11 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public abstract class ItemMapper {
-
-    public static final ItemMapper ITEM_MAPPER = Mappers.getMapper(ItemMapper.class);
-
     @BeforeMapping
     protected void enrichItemLabels(Item item, @MappingTarget ItemDto.ItemDtoBuilder itemDto) {
         final String labels = item.getLabels();
