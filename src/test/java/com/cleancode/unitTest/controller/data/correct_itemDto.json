@@ -1,0 +1,9 @@
+{
+  "name": "apple",
+  "context": "this is apple",
+  "imageUrl": "www.baidu.com",
+  "unitPrice": 1,
+  "discount": 1.0,
+  "expiredTime": "2999-12-13T00:00:00",
+  "labels": ["FRUIT","FOOD"]
+}
