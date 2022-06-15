@@ -1,8 +1,10 @@
 package com.cleancode.unitTest.service;
 
+import com.cleancode.unitTest.entity.Customer;
 import com.cleancode.unitTest.entity.Item;
 import com.cleancode.unitTest.exception.ItemNotValidException;
 import com.cleancode.unitTest.module.ItemDto;
+import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.repository.ItemRepository;
 import com.cleancode.unitTest.service.mapper.ItemMapper;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,4 +153,15 @@ public class CartServiceTest {
         verify((itemRepository), times(1)).save(grantItem);
         verify((itemRepository), times(1)).save(acceptItem);
     }
+
+    @Test
+    void should_return_total_price_0_when_user_without_items() {
+        final Customer customer = Customer.builder().id(1).build();
+        when(itemRepository.findByUserId(customer.getId())).thenReturn(Optional.empty());
+
+        final ItemTotalPriceDto totalPriceDto = cartService.getTotalPrice(customer);
+
+        assertThat(totalPriceDto.getTotalPrice()).isEqualTo(BigDecimal.ZERO);
+    }
+
 }
