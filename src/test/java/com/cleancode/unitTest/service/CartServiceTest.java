@@ -36,18 +36,22 @@ public class CartServiceTest {
 
     @Test
     void should_return_0_itemDto_when_user_have_no_item_in_cart() {
+        //given
         Integer customerId = 1;
         when(itemRepository.findByUserId(customerId)).thenReturn(Optional.of(Collections.emptyList()));
 
+        //when
         final List<ItemDto> items = cartService.getUserItems(customerId);
 
+        //then
         assertThat(items.size()).isEqualTo(0);
     }
 
     @Test
     void should_return_1_itemDto_when_user_have_only_one_item_in_cart() {
         Integer customerId = 1;
-        when(itemRepository.findByUserId(customerId)).thenReturn(Optional.of(Collections.singletonList(Item.builder().build())));
+        when(itemRepository.findByUserId(customerId))
+                .thenReturn(Optional.of(Collections.singletonList(Item.builder().build())));
 
         final List<ItemDto> items = cartService.getUserItems(customerId);
 
@@ -87,7 +91,7 @@ public class CartServiceTest {
     }
 
     @Test
-    void should_save_item_with_id_1_when_input_user_id_is_1() {
+    void should_save_item_with_id_1_when_input_user_id_with_1() {
         ItemDto itemDto = ItemDto.builder().build();
         Item expected = Item.builder().build();
         when(itemMapper.dtoToItem(itemDto)).thenReturn(expected);
@@ -116,14 +120,34 @@ public class CartServiceTest {
     }
 
     @Test
-    void should_save_items_for_both_both_user_when_itemDto_has_user_id_and_not_same_with_input_user_id() {
+    void should_save_items_for_both_user_when_itemDto_has_user_id_and_not_same_with_input_user_id() {
         ItemDto itemDto = ItemDto
                 .builder()
                 .userId(1)
                 .build();
 
-        cartService.grantItem(2, itemDto);
+        final int acceptUserId = 2;
+        cartService.grantItem(acceptUserId, itemDto);
 
         verify((itemRepository), times(2)).save(any(Item.class));
+    }
+
+    @Test
+    void should_save_items_for_grant_and_accept_users_when_itemDto_has_user_id_and_not_same_with_input_user_id() {
+        ItemDto itemDto = ItemDto
+                .builder()
+                .userId(1)
+                .build();
+        Item grantItem = Item.builder().build();
+        Item acceptItem = Item.builder().build();
+        when(itemMapper.dtoToItem(itemDto))
+                .thenReturn(grantItem)
+                .thenReturn(acceptItem);
+
+        final int acceptUserId = 2;
+        cartService.grantItem(acceptUserId, itemDto);
+
+        verify((itemRepository), times(1)).save(grantItem);
+        verify((itemRepository), times(1)).save(acceptItem);
     }
 }

@@ -54,7 +54,7 @@ public class CartService {
     }
 
     @Transactional
-    private void saveItemToUsers(Integer userId, ItemDto itemDto) {
+    void saveItemToUsers(Integer userId, ItemDto itemDto) {
         final Item userItem = itemMapper.dtoToItem(itemDto);
         itemRepository.save(userItem);
         itemDto.setUserId(userId);
