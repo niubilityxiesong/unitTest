@@ -7,6 +7,7 @@ import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.repository.ItemRepository;
 import com.cleancode.unitTest.service.mapper.ItemMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,14 +15,12 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,134 +31,61 @@ public class CartServiceTest {
     private ItemRepository itemRepository;
 
     @Mock
+    private CustomerService customerService;
+
+    @Mock
     private ItemMapper itemMapper;
 
     @InjectMocks
     private CartService cartService;
 
     @Test
-    void should_return_0_itemDto_when_user_have_no_item_in_cart() {
-        //given
-        Integer customerId = 1;
-        when(itemRepository.findByUserId(customerId)).thenReturn(Optional.of(Collections.emptyList()));
-
-        //when
-        final List<ItemDto> items = cartService.getUserItems(customerId);
-
-        //then
-        assertThat(items.size()).isEqualTo(0);
-    }
-
-    @Test
-    void should_return_1_itemDto_when_user_have_only_one_item_in_cart() {
-        Integer customerId = 1;
-        when(itemRepository.findByUserId(customerId))
-                .thenReturn(Optional.of(Collections.singletonList(Item.builder().build())));
-
-        final List<ItemDto> items = cartService.getUserItems(customerId);
-
-        assertThat(items.size()).isEqualTo(1);
-    }
-
-    @Test
-    void should_return_2_itemDto_when_user_have_items_in_cart() {
-        Integer customerId = 1;
-        ArrayList<Item> itemsList = new ArrayList<>();
-        itemsList.add(Item.builder().build());
-        itemsList.add(Item.builder().build());
-        when(itemRepository.findByUserId(customerId)).thenReturn(Optional.of(itemsList));
-
-        final List<ItemDto> items = cartService.getUserItems(customerId);
-
-        assertThat(items.size()).isEqualTo(2);
-    }
-
-    @Test
     void should_throw_exception_when_itemDto_has_user_id() {
+        int customerId = 1;
         ItemDto itemDto = ItemDto
                 .builder()
-                .userId(2)
+                .customerId(2)
                 .build();
+        doNothing().when(customerService).isValidUser(customerId);
 
-        assertThrows(ItemNotValidException.class, () -> cartService.setItem(1, itemDto));
+        assertThrows(ItemNotValidException.class, () -> cartService.setItem(customerId, itemDto));
     }
 
     @Test
     void should_save_item_when_itemDto_has_no_user_id() {
+        int customerId = 1;
+        doNothing().when(customerService).isValidUser(customerId);
         ItemDto itemDto = ItemDto.builder().build();
+        Item expectedItem = Item.builder().build();
+        when(itemMapper.dtoToItem(itemDto)).thenReturn(expectedItem);
 
-        cartService.setItem(1, itemDto);
+        cartService.setItem(customerId, itemDto);
 
-        verify((itemRepository), times(1)).save(any(Item.class));
+        verify((itemRepository), times(1)).save(expectedItem);
     }
 
     @Test
     void should_save_item_with_id_1_when_input_user_id_with_1() {
+        int customerId = 1;
+        doNothing().when(customerService).isValidUser(customerId);
         ItemDto itemDto = ItemDto.builder().build();
-        Item expected = Item.builder().build();
-        when(itemMapper.dtoToItem(itemDto)).thenReturn(expected);
+        Item expectedItem = Item.builder().build();
+        when(itemMapper.dtoToItem(itemDto)).thenReturn(expectedItem);
 
-        cartService.setItem(1, itemDto);
+        cartService.setItem(customerId, itemDto);
 
-        verify((itemRepository), times(1)).save(expected);
-        assertThat(expected.getUserId()).isEqualTo(1);
-    }
-
-    @Test
-    void should_throw_exception_when_itemDto_has_no_user_id() {
-        ItemDto itemDto = ItemDto.builder().build();
-
-        assertThrows(ItemNotValidException.class, () -> cartService.grantItem(1, itemDto));
-    }
-
-    @Test
-    void should_throw_exception_when_itemDto_has_user_id_and_same_with_input_user_id() {
-        ItemDto itemDto = ItemDto
-                .builder()
-                .userId(1)
-                .build();
-
-        assertThrows(ItemNotValidException.class, () -> cartService.grantItem(1, itemDto));
-    }
-
-    @Test
-    void should_save_items_for_both_user_when_itemDto_has_user_id_and_not_same_with_input_user_id() {
-        ItemDto itemDto = ItemDto
-                .builder()
-                .userId(1)
-                .build();
-
-        final int acceptUserId = 2;
-        cartService.grantItem(acceptUserId, itemDto);
-
-        verify((itemRepository), times(2)).save(any(Item.class));
-    }
-
-    @Test
-    void should_save_items_for_grant_and_accept_users_when_itemDto_has_user_id_and_not_same_with_input_user_id() {
-        ItemDto itemDto = ItemDto
-                .builder()
-                .userId(1)
-                .build();
-        Item grantItem = Item.builder().build();
-        Item acceptItem = Item.builder().build();
-        when(itemMapper.dtoToItem(itemDto))
-                .thenReturn(grantItem)
-                .thenReturn(acceptItem);
-
-        final int acceptUserId = 2;
-        cartService.grantItem(acceptUserId, itemDto);
-
-        verify((itemRepository), times(1)).save(grantItem);
-        verify((itemRepository), times(1)).save(acceptItem);
+        verify((itemRepository), times(1)).save(expectedItem);
+        assertThat(expectedItem.getCustomerId()).isEqualTo(customerId);
     }
 
     @Test
     void should_return_total_price_0_when_user_without_items() {
-        final Customer customer = Customer.builder().id(1).build();
-        when(itemRepository.findByUserId(customer.getId())).thenReturn(Optional.empty());
+        int customerId = 1;
+        final Customer customer = Customer.builder().id(customerId).build();
+        when(customerService.getCustomer(customerId)).thenReturn(customer);
+        when(itemRepository.findByCustomerId(customer.getId())).thenReturn(Optional.empty());
 
-        final ItemTotalPriceDto totalPriceDto = cartService.getTotalPrice(customer);
+        final ItemTotalPriceDto totalPriceDto = cartService.getTotalPrice(customerId);
 
         assertThat(totalPriceDto.getTotalPrice()).isEqualTo(BigDecimal.ZERO);
     }

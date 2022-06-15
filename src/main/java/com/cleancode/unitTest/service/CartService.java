@@ -9,14 +9,11 @@ import com.cleancode.unitTest.repository.ItemRepository;
 import com.cleancode.unitTest.service.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,44 +23,23 @@ public class CartService {
 
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
+    private final CustomerService customerService;
 
-    public void setItem(Integer userId, ItemDto itemDto) {
-        if (Objects.nonNull(itemDto.getUserId())) {
+    public void setItem(Integer customerId, ItemDto itemDto) {
+        customerService.isValidUser(customerId);
+
+        if (Objects.nonNull(itemDto.getCustomerId())) {
             throw new ItemNotValidException();
         }
 
         final Item item = itemMapper.dtoToItem(itemDto);
-        item.setUserId(userId);
+        item.setCustomerId(customerId);
         itemRepository.save(item);
     }
 
-    public List<ItemDto> getUserItems(Integer customerId) {
-        Optional<List<Item>> itemsOptional = itemRepository.findByUserId(customerId);
-        if (itemsOptional.isPresent()) {
-            List<Item> items = itemsOptional.get();
-            return items.stream().map(itemMapper::itemToDto).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
-    public void grantItem(Integer userId, ItemDto itemDto) {
-        if (Objects.isNull(itemDto.getUserId()) || userId.equals(itemDto.getUserId())) {
-            throw new ItemNotValidException();
-        }
-        saveItemToUsers(userId, itemDto);
-    }
-
-    @Transactional
-    void saveItemToUsers(Integer userId, ItemDto itemDto) {
-        final Item userItem = itemMapper.dtoToItem(itemDto);
-        itemRepository.save(userItem);
-        itemDto.setUserId(userId);
-        final Item anotherUserItem = itemMapper.dtoToItem(itemDto);
-        itemRepository.save(anotherUserItem);
-    }
-
-    public ItemTotalPriceDto getTotalPrice(Customer customer) {
-        Optional<List<Item>> optionalUserItems = itemRepository.findByUserId(customer.getId());
+    public ItemTotalPriceDto getTotalPrice(Integer customerId) {
+        Customer customer = customerService.getCustomer(customerId);
+        Optional<List<Item>> optionalUserItems = itemRepository.findByCustomerId(customer.getId());
         if (optionalUserItems.isEmpty()) {
             return new ItemTotalPriceDto();
         }

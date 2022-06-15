@@ -32,5 +32,5 @@ public class Item {
     private Double discount;
     private LocalDateTime expiredTime;
     private String labels;
-    private Integer userId;
+    private Integer customerId;
 }
