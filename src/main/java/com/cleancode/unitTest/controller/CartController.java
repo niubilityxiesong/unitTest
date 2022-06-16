@@ -23,7 +23,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/demo")
-    public ItemDto forControllerDemo(@PathVariable Integer customerId, @RequestBody @Valid ItemDto itemDto) {
+    public ItemDto forControllerTestDemo(@PathVariable Integer customerId, @RequestBody @Valid ItemDto itemDto) {
         return itemDto;
     }
 
