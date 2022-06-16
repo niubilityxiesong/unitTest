@@ -3,7 +3,6 @@ package com.cleancode.unitTest.controller;
 import com.cleancode.unitTest.module.ItemDto;
 import com.cleancode.unitTest.module.ItemTotalPriceDto;
 import com.cleancode.unitTest.service.CartService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +21,11 @@ import java.net.URI;
 public class CartController {
 
     private final CartService cartService;
+
+    @PostMapping("/demo")
+    public ItemDto forControllerDemo(@PathVariable Integer customerId, @RequestBody @Valid ItemDto itemDto) {
+        return itemDto;
+    }
 
     @PostMapping("/item")
     public ResponseEntity<String> setItem(@PathVariable Integer customerId, @RequestBody @Valid ItemDto itemDto) {
