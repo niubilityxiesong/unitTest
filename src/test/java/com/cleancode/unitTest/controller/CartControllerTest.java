@@ -37,7 +37,7 @@ class CartControllerTest {
     }
 
     @Test
-    void should_not_throw_exception_when_calculate_total_price() throws Exception {
+    void should_return_ok_when_calculate_total_price() throws Exception {
         ItemTotalPriceDto itemTotalPriceDto = new ItemTotalPriceDto();
         when(cartService.getTotalPrice(1)).thenReturn(itemTotalPriceDto);
         mockMvc.perform(
@@ -48,7 +48,7 @@ class CartControllerTest {
     }
 
     @Test
-    void should_not_throw_exception_when_itemDto_is_correct() throws Exception {
+    void should_return_ok_when_itemDto_is_correct() throws Exception {
         String itemDtoJsonString = GsonUtils.toJsonString("correct_itemDto.json");
         doNothing().when(cartService).setItem(eq(1), any(ItemDto.class));
 
@@ -63,7 +63,7 @@ class CartControllerTest {
     }
 
     @Test
-    void should_throw_exception_when_itemDto_without_unit_price() throws Exception {
+    void should_return_bad_request_when_itemDto_without_unit_price() throws Exception {
         String jsonString = GsonUtils.toJsonString("without_unit_price_itemDto.json");
         doNothing().when(cartService).setItem(eq(1), any(ItemDto.class));
 
@@ -78,7 +78,7 @@ class CartControllerTest {
     }
 
     @Test
-    void should_throw_exception_when_itemDto_without_discount() throws Exception {
+    void should_return_bad_request_when_itemDto_without_discount() throws Exception {
         String jsonString = GsonUtils.toJsonString("without_discount_itemDto.json");
         doNothing().when(cartService).setItem(eq(1), any(ItemDto.class));
 
@@ -93,7 +93,7 @@ class CartControllerTest {
     }
 
     @Test
-    void should_throw_exception_when_itemDto_expired_date_in_post() throws Exception {
+    void should_return_bad_request_when_itemDto_expired_date_in_post() throws Exception {
         String jsonString = GsonUtils.toJsonString("expired_time_post_itemDto.json");
         doNothing().when(cartService).setItem(eq(1), any(ItemDto.class));
 
