@@ -53,12 +53,7 @@ public class CartService {
     }
 
     private ItemTotalPriceDto calculateVipDiscount(boolean isVip, ItemTotalPriceDto itemsPrice) {
-        ItemTotalPriceDto vipTotalPrice = ItemTotalPriceDto
-                .builder()
-                .totalPrice(itemsPrice.getTotalPrice())
-                .discountPrice(itemsPrice.getDiscountPrice())
-                .originalPrice(itemsPrice.getOriginalPrice())
-                .build();
+        ItemTotalPriceDto vipTotalPrice = itemsPrice.copy();
         if (isVip && itemsPrice.getTotalPrice().compareTo(new BigDecimal(VIP_DISCOUNT_LIMIT)) > 0) {
             vipTotalPrice.setTotalPrice(vipTotalPrice.getTotalPrice().subtract(new BigDecimal(VIP_DISCOUNT)));
             vipTotalPrice.setDiscountPrice(vipTotalPrice.getDiscountPrice().add(new BigDecimal(VIP_DISCOUNT)));
