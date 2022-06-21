@@ -21,4 +21,13 @@ public class ItemTotalPriceDto {
         this.totalPrice = BigDecimal.ZERO;
         this.originalPrice = BigDecimal.ZERO;
     }
+
+    public ItemTotalPriceDto copy() {
+        return ItemTotalPriceDto
+                .builder()
+                .discountPrice(discountPrice)
+                .originalPrice(originalPrice)
+                .totalPrice(totalPrice)
+                .build();
+    }
 }
